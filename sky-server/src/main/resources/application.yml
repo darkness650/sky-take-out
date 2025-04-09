@@ -11,6 +11,9 @@ spring:
     username: root
     password: Aa17526909261
     driver-class-name: com.mysql.cj.jdbc.Driver
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 mybatis:
   #mapper配置文件
