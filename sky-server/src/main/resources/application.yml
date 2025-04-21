@@ -15,6 +15,11 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: Aa17526909261
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
@@ -40,3 +45,14 @@ sky:
     admin-ttl: 7200000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+    user-secret-key: itheima
+    user-token-name: authentication
+    user-ttl: 7200000
+  alioss:
+    access-key-id: LTAI5tMuFT8hg156K9pZ6vev
+    access-key-secret: XRw1WBExBOXHg1JCpiypCqHdzBicyE
+    bucket-name: javaweb-itheima-tliasystem
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+  wechat:
+    appid: wxb30ee2aac53dddb0
+    secret: bc2e2104b872d0a1040750f4f2eec5bb
