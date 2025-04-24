@@ -6,3 +6,4 @@
 **/test/
 nginx-1.20.2
 ./sky-server/src/main/resources/application-dev.yml
+./sky-server/src/main/resources/application.yml
