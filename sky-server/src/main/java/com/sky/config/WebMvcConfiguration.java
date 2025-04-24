@@ -3,6 +3,8 @@ package com.sky.config;
 import com.sky.interceptor.JwtTokenAdminInterceptor;
 import com.sky.interceptor.JwtTokenUserInterceptor;
 import com.sky.json.JacksonObjectMapper;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,12 +14,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.List;
 
@@ -56,38 +52,18 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      * 通过knife4j生成接口文档
      * @return
      */
+
     @Bean
-    public Docket docket1() {
-        ApiInfo apiInfo = new ApiInfoBuilder()
-                .title("苍穹外卖项目接口文档")
-                .version("2.0")
-                .description("苍穹外卖项目接口文档")
-                .build();
-        log.info("准备生成接口文档");
-        Docket docket = new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.admin"))
-                .paths(PathSelectors.any())
-                .build();
-        return docket;
+    public OpenAPI openAPI() {
+        log.info("开始注册Knife4j...");
+        return new OpenAPI()
+                .info(new Info()
+                        .title("苍穹外卖项目接口文档")
+                        .version("2.0").
+                        description("苍穹外卖项目接口文档"));
     }
-    @Bean
-    public Docket docket2() {
-        ApiInfo apiInfo = new ApiInfoBuilder()
-                .title("苍穹外卖项目接口文档")
-                .version("2.0")
-                .description("苍穹外卖项目接口文档")
-                .build();
-        log.info("准备生成接口文档");
-        Docket docket = new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.user"))
-                .paths(PathSelectors.any())
-                .build();
-        return docket;
-    }
+
+
     /**
      * 设置静态资源映射
      * @param registry
@@ -101,12 +77,29 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     @Override
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        log.info("扩展消息转换器");
-        //创建消息转换器对象
+        log.info("扩展消息转换器...");
+        // 这样做会导致swagger的json数据无法解析
+//        // 创建一个消息转换器对象
+//        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+//        // 需要为消息转换器设置一个对象转换器，对象转换器可以将Java对象序列化为json数据
+//        converter.setObjectMapper(new JacksonObjectMapper());
+//        // 将自己的消息转化器加入容器中（放到最前面）
+//        converters.add(converter);
+
+        // 避免新创建converter
+        for(HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter j2httpMessageConverter) {
+                log.info("已存在MappingJackson2HttpMessageConverter，进行修改");
+                // 设置对象转换器
+                j2httpMessageConverter.setObjectMapper(new JacksonObjectMapper());
+                // 退出
+                return;
+            }
+        }
+        // 否则再创建新的消息转换器对象
+        log.info("不存在MappingJackson2HttpMessageConverter，创建新的");
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        //需要为消息转换器设置对象转换器
         converter.setObjectMapper(new JacksonObjectMapper());
-        //将自己的消息转换器加入容器中
-        converters.add(0,converter);
+        converters.addFirst(converter);
     }
 }

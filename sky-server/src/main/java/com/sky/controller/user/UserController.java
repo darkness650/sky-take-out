@@ -7,8 +7,8 @@ import com.sky.result.Result;
 import com.sky.service.UserService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.UserLoginVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,14 +22,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user/user")
 @Slf4j
-@Api("用户端接口")
+@Tag(name="用户端接口")
 public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
     private JwtProperties jwtProperties;
     @PostMapping("/login")
-    @ApiOperation("用户登录")
+    @Operation(description="用户登录")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
 
         User user =userService.getUserByCode(userLoginDTO);
@@ -41,4 +41,5 @@ public class UserController {
                 .token(token).build();
         return Result.success(userLoginVO);
     }
+
 }

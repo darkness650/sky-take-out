@@ -1,25 +1,28 @@
 server:
   port: 8080
-
+  servlet:
+    encoding:
+      force-response: true # 强制使用 UTF-8 编码
+      charset: UTF-8
 spring:
   profiles:
     active: dev
   main:
     allow-circular-references: true
   datasource:
-    url: jdbc:mysql://localhost:3306/sky_take_out
-    username: root
-    password: Aa17526909261
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${sky.datasource.username}
+      password: ${sky.datasource.password}
+      driver-class-name: ${sky.datasource.driver-class-name}
   mvc:
     pathmatch:
-      matching-strategy: ant_path_matcher
+      matching-strategy: ANT_PATH_MATCHER
 
   data:
     redis:
       host: localhost
       port: 6379
-      password: Aa17526909261
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
@@ -40,19 +43,57 @@ logging:
 sky:
   jwt:
     # 设置jwt签名加密时使用的秘钥
-    admin-secret-key: itcast
+    admin-secret-key: ${sky.jwt.admin-secret-key}
     # 设置jwt过期时间
-    admin-ttl: 7200000
+    admin-ttl: ${sky.jwt.admin-ttl}
     # 设置前端传递过来的令牌名称
-    admin-token-name: token
-    user-secret-key: itheima
-    user-token-name: authentication
-    user-ttl: 7200000
+    admin-token-name: ${sky.jwt.admin-token-name}
+    user-secret-key: ${sky.jwt.user-secret-key}
+    user-token-name: ${sky.jwt.user-token-name}
+    user-ttl: ${sky.jwt.user-ttl}
   alioss:
-    access-key-id: LTAI5tMuFT8hg156K9pZ6vev
-    access-key-secret: XRw1WBExBOXHg1JCpiypCqHdzBicyE
-    bucket-name: javaweb-itheima-tliasystem
-    endpoint: oss-cn-hangzhou.aliyuncs.com
+    access-key-id: ${sky.alioss.access-key-id}
+    access-key-secret: ${sky.alioss.access-key-secret}
+    bucket-name: ${sky.alioss.bucket-name}
+    endpoint: ${sky.alioss.endpoint}
   wechat:
-    appid: wxb30ee2aac53dddb0
-    secret: bc2e2104b872d0a1040750f4f2eec5bb
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
+#knife4j配置
+# Knife4j配置
+# springdoc-openapi配置
+springdoc:
+  # get请求多参数时不需要添加额外的@ParameterObject和@Parameter注解
+  default-flat-param-object: true
+  # 启用swaggerUI
+  swagger-ui:
+    #自定义swagger前端请求路径，输入http：127.0.0.1:8080/swagger-ui.html会自动重定向到swagger页面
+    path: /swagger-ui.html
+    enabled: true
+    #    tags-sorter: alpha # 标签的排序方式 alpha:按照子母顺序排序（@ApiSupport注解排序不生效，因此需要设置）
+    #    operations-sorter: alpha # 接口的排序方式 alpha:按照子母顺序排序（@ApiOperationSupport注解排序生效，因此这里不作设置）
+    tags-sorter: alpha
+    operations-sorter: alpha # 设置规则为order，该规则会使用Knife4j的增强排序扩展规则`x-order`
+  # 启用文档，默认开启
+  api-docs:
+    path: /v3/api-docs    #swagger后端请求地址
+  group-configs:
+    - group: 'admin'
+      display-name: '管理端接口'
+      paths-to-match: '/admin/**'
+      packages-to-scan: 'com.sky.controller.admin'
+    - group: 'user'
+      display-name: '用户端接口'
+      paths-to-match: '/user/**'
+      packages-to-scan: 'com.sky.controller.user'
+
+#knife4j配置
+knife4j:
+  #是否启用增强设置
+  enable: false
+  #开启生产环境屏蔽
+  production: false
+  setting:
+    language: zh_cn
+    enable-version: true
+    enable-swagger-models: true
