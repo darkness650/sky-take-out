@@ -38,4 +38,33 @@
         </set>
         where id = #{id}
     </update>
+    <select id="getByUser" resultType="com.sky.vo.OrderVO">
+        select * from orders
+        <where>
+            <if test="userId!=null">user_id=#{userId}</if>
+            <if test="status!=null">and status=#{status}</if>
+            <if test="beginTime!=null and endTime!=null">and order_time between #{beginTime} and #{endTime}</if>
+            <if test="number!=null">and number=#{number}</if>
+            <if test="phone!=null">and phone=#{phone}</if>
+        </where>
+    </select>
+    <select id="getStatistics" resultType="com.sky.vo.OrderStatisticsVO">
+        select (select count(*) from orders where status=3) confirmed,
+               (select count(*)  from orders where status=4) deliveryInProgress,
+               (select count(*)  from orders where status=2) toBeConfirmed
+    </select>
+    <select id="sumByMap" resultType="java.lang.Double">
+        select sum(amount) from orders
+            <where>
+                <if test="status!=null">status=#{status}</if>
+                <if test="begin!=null and end!=null">and checkout_time between #{begin} and #{end}</if>
+            </where>
+    </select>
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(*) from orders
+        <where>
+            <if test="status!=null">status=#{status}</if>
+            <if test="begin!=null and end!=null">and checkout_time between #{begin} and #{end}</if>
+        </where>
+    </select>
 </mapper>
